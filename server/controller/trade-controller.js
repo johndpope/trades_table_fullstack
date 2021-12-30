@@ -10,7 +10,7 @@ const nameList = ["source", "unmatched_NVsN", "unmatched_NVs1"];
 
 router.get("/sourcetojson", async (req, res, next) => {
   await CSVToJSON()
-    .fromFile("../../seconed project/sql/baml_202101.csv")
+    .fromFile("./../../third project/db/january 2021/baml_202101.csv")
     .then((result) => {
       fs.writeFile("source.json", JSON.stringify(result, null, 4), (err) => {
         if (err) {
@@ -19,12 +19,13 @@ router.get("/sourcetojson", async (req, res, next) => {
         console.log("JSON array is saved.");
       });
 
-      // res.json(result)
+      res.json(result);
     })
     .catch((err) => {
       // log error if any
       console.log(err);
     });
+  // console.log(results);
 });
 
 router.get("/createtable", async (req, res, next) => {
@@ -116,22 +117,6 @@ router.get("/1vs1", async (req, res, next) => {
 
   res.json(result1vs1);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get("/getstats", async (req, res) => {
   //   await CSVToJSON()

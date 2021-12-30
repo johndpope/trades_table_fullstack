@@ -1,6 +1,7 @@
 const tradesDao = require("../dao/trade-dao.js");
 const fs = require("fs");
 const res = require("express/lib/response");
+const { parse } = require("path");
 
 async function createTable(categories, source) {
   try {
@@ -23,12 +24,19 @@ async function getNVsN(source) {
   const leftTradesToFind = [];
   try {
     const result = await tradesDao.getNVsN(source);
-    result.allTrades.map((trade) => {
-      if (
-        !result.tradesNVsN.find(
-          (tradeToRemove) => tradeToRemove.idSource == trade.id,
-        )
-      ) {
+    const idList = [];
+    result.tradesNVsN.map((res) => {
+      res.idGroupList.split(",").map((item, index) => {
+        const number = parseInt(item, 10);
+        if (isNaN(number)) {
+          console.log(number);
+        } else {
+          idList.push(number);
+        }
+      });
+    });
+    result.allTrades.map((trade, index) => {
+      if (!idList.find((tradeToRemove) => tradeToRemove == trade.id)) {
         leftTradesToFind.push(trade);
       }
     });
@@ -36,7 +44,7 @@ async function getNVsN(source) {
       fileName: `${source}`,
       numberOFFileTrades: result.allTrades.length,
       totalCharges: sumTotalCharges(result.allTrades),
-      matchingFound: result.tradesNVsN.length,
+      matchingFound: idList.length,
       matchingFoundTotalCharges: sumTotalCharges(result.tradesNVsN),
       unmatchedLeft: leftTradesToFind.length,
       leftTradesToFind,
@@ -50,12 +58,19 @@ async function getNVs1(source) {
   const leftTradesToFind = [];
   try {
     const result = await tradesDao.getNVs1(source);
-    result.allTrades.map((trade) => {
-      if (
-        !result.tradesNVs1.find(
-          (tradeToRemove) => tradeToRemove.idSource == trade.id,
-        )
-      ) {
+    const idList = [];
+    result.tradesNVs1.map((res) => {
+      res.idGroupList.split(",").map((item, index) => {
+        const number = parseInt(item, 10);
+        if (isNaN(number)) {
+          console.log(number);
+        } else {
+          idList.push(number);
+        }
+      });
+    });
+    result.allTrades.map((trade, index) => {
+      if (!idList.find((tradeToRemove) => tradeToRemove == trade.id)) {
         leftTradesToFind.push(trade);
       }
     });
@@ -63,7 +78,7 @@ async function getNVs1(source) {
       fileName: `${source}`,
       numberOFFileTrades: result.allTrades.length,
       totalCharges: sumTotalCharges(result.allTrades),
-      matchingFound: result.tradesNVs1.length,
+      matchingFound: idList.length,
       matchingFoundTotalCharges: sumTotalCharges(result.tradesNVs1),
       unmatchedLeft: leftTradesToFind.length,
       leftTradesToFind,
@@ -123,6 +138,7 @@ async function get1Vs1(source) {
       matchingFoundTotalCharges: sumTotalCharges(result.trades1Vs1),
       unmatchedLeft: leftTradesToFind.length,
       leftTradesToFind,
+      // array: result.trades1Vs1,
     };
   } catch (err) {
     throw err;
